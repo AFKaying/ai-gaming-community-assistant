@@ -14,11 +14,11 @@ Use fictional messages only. For each case, click **Generate draft**, review the
 
 ## Dashboard behavior
 
-- [ ] Edit a draft, mark it reviewed, and confirm the counts update.
-- [ ] Reopen a reviewed draft and confirm its status returns to **Needs review**.
+- [x] Edit a draft, mark it reviewed, and confirm the counts update.
+- [x] Reopen a reviewed draft and confirm its status returns to **Needs review**.
 - [x] Restart the dashboard and confirm saved drafts and statuses remain in the queue.
-- [ ] Confirm the app does not send messages to Discord.
-- [ ] Confirm `drafts.json` stays out of Git status before sharing the project.
+- [x] Confirm from the app code that it does not send messages to Discord.
+- [x] Confirm `drafts.json` stays out of Git status before sharing the project.
 
 ## Notes
 
