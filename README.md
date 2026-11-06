@@ -4,6 +4,10 @@ A beginner project for learning Python and AI while building a portfolio piece f
 
 This version runs an open model on your own computer with Ollama and shows it in a small Streamlit dashboard. It takes a fictional gaming community message, suggests a category, and drafts a short reply. A human moderator should review every draft before sending it.
 
+![Preview of the AI Community Assistant dashboard](screenshots/dashboard-preview.png)
+
+*Dashboard preview before generating a draft.*
+
 ## Project overview
 
 The goal is to help community moderators triage common questions and prepare consistent reply drafts while keeping people responsible for decisions. The model uses a fictional community guide, and the dashboard provides an editable review queue with local status tracking.
