@@ -9,6 +9,25 @@ import streamlit as st
 
 DRAFTS_FILE = Path(__file__).with_name("drafts.json")
 GUIDE_FILE = Path(__file__).with_name("community_guide.md")
+CATEGORY_ACCOUNT_HELP = "Account help"
+ACCOUNT_HELP_REPLY = (
+    "Please use the game's official account recovery or support process. "
+    "If you'd like a moderator to help, share only the non-sensitive error message."
+)
+CATEGORY_GUIDANCE = {
+    "Event question": (
+        "Answer using event facts from the community guide only. If the guide omits a date "
+        "or detail, say so and refer the member to a moderator."
+    ),
+    "Bug report": (
+        "Ask for the platform, game version, what happened, and the steps before the issue. "
+        "Do not promise a fix or investigation."
+    ),
+    "General message": (
+        "Ask one brief clarifying question or suggest a human moderator follow up. "
+        "Do not assume what the issue is."
+    ),
+}
 
 
 def load_draft_queue():
@@ -20,6 +39,18 @@ def load_draft_queue():
         return saved_drafts if isinstance(saved_drafts, list) else []
     except (OSError, json.JSONDecodeError):
         return []
+
+
+def classify_message(message):
+    text = message.casefold()
+
+    if any(term in text for term in ("login", "log in", "sign in", "sign-in", "account", "password")):
+        return "Account help"
+    if any(term in text for term in ("event", "community night", "tournament")):
+        return "Event question"
+    if any(term in text for term in ("bug", "crash", "freeze", "error", "glitch")):
+        return "Bug report"
+    return "General message"
 
 
 def save_draft_queue():
@@ -42,6 +73,7 @@ st.write("Draft helpful replies for a fictional gaming community.")
 
 st.info(
     "This prototype uses a model running on your computer. "
+    "Account-help messages use an approved safety reply. "
     "Review and edit every draft before sharing it."
 )
 st.caption("Drafts and review statuses are saved locally in this project folder.")
@@ -58,41 +90,48 @@ community_message = st.text_area(
 )
 
 if st.button("Generate draft", type="primary", disabled=not community_message.strip()):
-    with st.spinner("The local AI is preparing a draft..."):
+    category = classify_message(community_message)
+    with st.spinner("Preparing a moderator draft..."):
         try:
-            community_guide = GUIDE_FILE.read_text(encoding="utf-8")
-            response = ollama.chat(
-                model="qwen3:1.7b",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You help moderators of a fictional gaming Discord community. "
-                            "Read the member's message, choose a category (Event question, "
-                            "Account help, Bug report, or General message), and draft a short, "
-                            "kind reply. Ask one follow-up question only when needed to help; "
-                            "never ask for information already provided in the reply. Use only the facts "
-                            "in the COMMUNITY GUIDE below. Do not invent event times, policies, "
-                            "or support steps. If the guide does not contain an answer, say a "
-                            "moderator can confirm it, and do not infer where or when updates "
-                            "will be shared. Do not promise account recovery or that the team will "
-                            "investigate, fix, escalate, or reply by a certain time. Never ask "
-                            "users to share or check passwords, security codes, email addresses, "
-                            "or other private account details. For login problems, ask only for "
-                            "a non-sensitive description of the error, or say a human moderator "
-                            "can share the approved recovery steps. Do not invent recovery steps. "
-                            "If the issue needs a decision or private support, say a human moderator can follow up. Label the result as "
-                            "Category and Suggested reply. This is a draft for moderator review."
-                            f"\n\nCOMMUNITY GUIDE:\n{community_guide}"
-                        ),
-                    },
-                    {"role": "user", "content": community_message},
-                ],
-            )
+            if category == CATEGORY_ACCOUNT_HELP:
+                reply_text = ACCOUNT_HELP_REPLY
+            else:
+                community_guide = GUIDE_FILE.read_text(encoding="utf-8")
+                response = ollama.chat(
+                    model="qwen3:1.7b",
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                "You help moderators of a fictional gaming Discord community. "
+                                f"The app selected the category: {category}. Keep this category and "
+                                "do not reclassify the message. Follow this category guidance exactly: "
+                                f"{CATEGORY_GUIDANCE[category]} "
+                                "Write a short, kind reply. Use only facts in the COMMUNITY GUIDE. "
+                                "Do not invent event times, policies, or support steps. If the guide "
+                                "omits an answer, say a moderator can confirm it. Do not promise the "
+                                "team will investigate, fix, escalate, or reply by a certain time. Never "
+                                "ask for passwords, security codes, email addresses, or private account "
+                                "details. Ask a follow-up only when needed, and never repeat information "
+                                "already provided. Output only the suggested reply text, without a "
+                                "category heading. This is a draft for moderator review."
+                                f"\n\nCOMMUNITY GUIDE:\n{community_guide}"
+                            ),
+                        },
+                        {"role": "user", "content": community_message},
+                    ],
+                )
+                reply_text = response.message.content.strip()
+                reply_lines = reply_text.splitlines()
+                if reply_lines and reply_lines[0].strip().casefold().startswith("category:"):
+                    reply_text = "\n".join(reply_lines[1:]).strip()
+                if reply_text.casefold().startswith("suggested reply:"):
+                    reply_text = reply_text.partition(":")[2].strip()
+
             st.session_state["draft_queue"].append(
                 {
                     "message": community_message,
-                    "reply": response.message.content,
+                    "reply": f"Category: {category}\nSuggested reply: {reply_text}",
                     "status": "Needs review",
                 }
             )

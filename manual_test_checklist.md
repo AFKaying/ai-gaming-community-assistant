@@ -8,6 +8,7 @@ Use fictional messages only. For each case, click **Generate draft**, review the
 | --- | --- | --- |
 | `My game freezes whenever I launch it` | Bug report; asks for useful troubleshooting details without promising a fix. | Checked during build |
 | `I can't log in to my account` | Account help; asks for a non-sensitive error description, never asks for credentials. | Checked during build |
+| `Can't seem to login` | Account help; uses the approved reply and asks only for a non-sensitive error description. | Checked after template update |
 | `When is Community Night?` | Event question; uses Friday at 7:00 PM UTC and `#party-lobby` from the community guide. | Checked during build |
 | `When is the next monthly tournament?` | Does not invent a date; points to a moderator in `#tournament-desk`. | Checked during build; response included a little extra filler |
 | `Can someone help me?` | General message; asks for context or suggests a moderator follow-up. | Checked during build |
