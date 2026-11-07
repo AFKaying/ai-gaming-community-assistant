@@ -67,6 +67,11 @@ def save_draft_edit(index):
     save_draft_queue()
 
 
+def save_draft_feedback(index, feedback):
+    st.session_state["draft_queue"][index]["feedback"] = feedback
+    save_draft_queue()
+
+
 st.set_page_config(page_title="AI Community Assistant", page_icon="🎮")
 st.title("🎮 AI Community Assistant")
 st.write("Draft helpful replies for a fictional gaming community.")
@@ -149,8 +154,15 @@ if st.session_state["draft_queue"]:
     needs_review = sum(item["status"] == "Needs review" for item in queue)
     reviewed = sum(item["status"] == "Reviewed" for item in queue)
     st.write(f"{len(queue)} drafts · {needs_review} need review · {reviewed} reviewed")
+    st.caption("Drafts needing review appear first, newest at the top.")
 
-    for number, item in enumerate(queue, start=1):
+    display_order = sorted(
+        range(len(queue)),
+        key=lambda index: (queue[index]["status"] == "Reviewed", -index),
+    )
+    for index in display_order:
+        item = queue[index]
+        number = index + 1
         st.markdown(f"### Draft {number} · {item['status']}")
         st.caption(f"Member message: {item['message']}")
         st.text_area(
@@ -162,6 +174,33 @@ if st.session_state["draft_queue"]:
             on_change=save_draft_edit,
             args=(number - 1,),
         )
+
+        st.caption("Was this draft helpful?")
+        helpful_column, changes_column = st.columns(2)
+        with helpful_column:
+            helpful_selected = item.get("feedback") == "Helpful"
+            helpful_label = "✓ Helpful" if helpful_selected else "Helpful"
+            if st.button(
+                helpful_label,
+                key=f"helpful_{number}",
+                type="secondary",
+            ):
+                save_draft_feedback(number - 1, "Helpful")
+                st.rerun()
+        with changes_column:
+            changes_selected = item.get("feedback") == "Needs changes"
+            changes_label = "✓ Needs changes" if changes_selected else "Needs changes"
+            if st.button(
+                changes_label,
+                key=f"needs_changes_{number}",
+                type="secondary",
+            ):
+                save_draft_feedback(number - 1, "Needs changes")
+                st.rerun()
+        if item.get("feedback") == "Helpful":
+            st.success("Feedback saved on this computer: Helpful")
+        elif item.get("feedback") == "Needs changes":
+            st.warning("Feedback saved on this computer: Needs changes")
 
         if item["status"] == "Needs review":
             if st.button("Mark as reviewed", key=f"mark_reviewed_{number}"):

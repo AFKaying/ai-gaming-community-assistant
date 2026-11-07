@@ -19,6 +19,8 @@ The goal is to help community moderators triage common questions and prepare con
 - Drafts a helpful response using facts from `community_guide.md`.
 - Runs locally with Ollama; no paid API key is needed.
 - Lets a moderator edit, review, and reopen drafts.
+- Lets a moderator record whether a draft was helpful or needs changes.
+- Shows drafts needing review first, with the newest at the top of the queue.
 - Saves the review queue in a local file that is excluded from Git by `.gitignore`.
 - Does not connect to Discord or send messages.
 
@@ -63,6 +65,7 @@ The model download needs an internet connection and disk space. After downloadin
 - Streamlit turns the Python script into a local web page.
 - The message box collects an example message, and the button starts the AI request.
 - Drafts appear in a review queue. A moderator can revise each draft, mark it reviewed, or reopen it.
+- A moderator can record whether a draft was helpful or needs changes; this feedback is saved locally with the draft.
 - The review queue is saved locally in `drafts.json`, so it remains after closing the dashboard. The `.gitignore` file keeps this local history out of GitHub by default.
 - The app does not connect to Discord or send messages.
 
