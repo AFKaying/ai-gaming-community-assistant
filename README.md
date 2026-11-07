@@ -14,8 +14,9 @@ The goal is to help community moderators triage common questions and prepare con
 
 ## Features
 
-- Uses simple Python rules to label event, account, bug, and general messages.
+- Uses simple Python rules to label event, account, server-status, bug, and general messages.
 - Uses an approved fixed reply for account-help messages; the local AI drafts replies for event, bug, and general messages.
+- Uses a fixed reply for server-status questions because the assistant cannot check live server conditions.
 - Drafts a helpful response using facts from `community_guide.md`.
 - Runs locally with Ollama; no paid API key is needed.
 - Lets a moderator edit, review, and reopen drafts.
@@ -55,8 +56,8 @@ The model download needs an internet connection and disk space. After downloadin
 
 - The `system` message gives the AI its role and safety boundaries.
 - The `user` message contains the example from the community member.
-- `classify_message(...)` assigns the category with clear keyword rules; the AI focuses on writing the reply.
-- `chat(...)` sends event, bug, and general messages to the local Ollama model. Account-help messages use an approved reply in the app code.
+- `classify_message(...)` assigns the category with clear keyword rules; the AI focuses on writing most replies.
+- `chat(...)` sends event, bug, and general messages to the local Ollama model. Account-help and server-status messages use fixed replies in the app code.
 - `response.message.content` is the draft displayed in the dashboard.
 - The assistant reads `community_guide.md` and uses those fictional facts when drafting answers. Update that guide when you want to change the community's events or support information.
 

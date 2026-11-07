@@ -10,9 +10,15 @@ import streamlit as st
 DRAFTS_FILE = Path(__file__).with_name("drafts.json")
 GUIDE_FILE = Path(__file__).with_name("community_guide.md")
 CATEGORY_ACCOUNT_HELP = "Account help"
+CATEGORY_SERVER_STATUS = "Server status"
 ACCOUNT_HELP_REPLY = (
     "Please use the game's official account recovery or support process. "
     "If you'd like a moderator to help, share only the non-sensitive error message."
+)
+SERVER_STATUS_REPLY = (
+    "I can't check live server status. Please check the game's official status page "
+    "or ask a moderator to confirm. If the servers appear online but you still can't "
+    "log in, a moderator can help route the issue."
 )
 CATEGORY_GUIDANCE = {
     "Event question": (
@@ -44,8 +50,12 @@ def load_draft_queue():
 def classify_message(message):
     text = message.casefold()
 
+    server_terms = ("server", "servers", "service")
+    status_terms = ("down", "offline", "outage", "maintenance", "status", "up")
+    if any(term in text for term in server_terms) and any(term in text for term in status_terms):
+        return CATEGORY_SERVER_STATUS
     if any(term in text for term in ("login", "log in", "sign in", "sign-in", "account", "password")):
-        return "Account help"
+        return CATEGORY_ACCOUNT_HELP
     if any(term in text for term in ("event", "community night", "tournament")):
         return "Event question"
     if any(term in text for term in ("bug", "crash", "freeze", "error", "glitch")):
@@ -100,6 +110,8 @@ if st.button("Generate draft", type="primary", disabled=not community_message.st
         try:
             if category == CATEGORY_ACCOUNT_HELP:
                 reply_text = ACCOUNT_HELP_REPLY
+            elif category == CATEGORY_SERVER_STATUS:
+                reply_text = SERVER_STATUS_REPLY
             else:
                 community_guide = GUIDE_FILE.read_text(encoding="utf-8")
                 response = ollama.chat(
