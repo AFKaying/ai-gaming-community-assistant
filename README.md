@@ -4,9 +4,9 @@ AI Community Assistant is a local AI-assisted moderation dashboard for a fiction
 
 Account-help and server-status questions receive fixed safety-aware replies. Drafts and feedback are saved locally. The app does not connect to Discord or send messages, and every reply should be reviewed by a human moderator before sharing.
 
-![Event question draft ready for moderator review](screenshots/dashboard-preview.png)
+![Server-status draft ready for moderator review](screenshots/dashboard-preview.png)
 
-*Example of the assistant using the community guide to answer an event question.*
+*Example of the assistant safely handling a server-status question.*
 
 ## Project overview
 
