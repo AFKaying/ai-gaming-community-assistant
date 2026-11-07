@@ -1,8 +1,8 @@
 # AI Community Assistant
 
-A beginner project for learning Python and AI while building a portfolio piece for community management.
+AI Community Assistant is a local AI-assisted moderation dashboard for a fictional gaming community, built with Python, Streamlit, and Ollama. It categorizes sample member messages, drafts replies using a community guide, and lets moderators edit, review, and rate each draft.
 
-This version runs an open model on your own computer with Ollama and shows it in a small Streamlit dashboard. It takes a fictional gaming community message, suggests a category, and drafts a short reply. A human moderator should review every draft before sending it.
+Account-help and server-status questions receive fixed safety-aware replies. Drafts and feedback are saved locally. The app does not connect to Discord or send messages, and every reply should be reviewed by a human moderator before sharing.
 
 ![Event question draft ready for moderator review](screenshots/dashboard-preview.png)
 
